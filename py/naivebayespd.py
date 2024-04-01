@@ -1,3 +1,10 @@
+# run below commands in powershell in order
+# cd to current folder
+# python -m venv venv
+# .\venv\Scripts\Activate.ps1
+# pip install pandas matplotlib scikit-learn
+# python ./naivebayespd.py
+
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.naive_bayes import GaussianNB

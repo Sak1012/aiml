@@ -4,8 +4,8 @@ class Node:
     def __init__(self, state, parent=None, g=0, h=0):
         self.state = state
         self.parent = parent
-        self.g = g  # Cost from start node to current node
-        self.h = h  # Heuristic value (estimated cost from current node to goal)
+        self.g = g
+        self.h = h
 
     def f(self):
         return self.g + self.h
@@ -42,15 +42,18 @@ def astar_search(start_state, goal_state, heuristic):
     return None
 
 def get_neighbors(state):
-    # Implement your function to get neighboring states here
-    pass
+    x, y = state
+    # Assuming movement is allowed in 4 directions (up, down, left, right)
+    neighbors = [(x-1, y), (x+1, y), (x, y-1), (x, y+1)]
+    return neighbors
+
 
 def heuristic(state, goal_state):
-    # Implement your heuristic function here
-    pass
+    # Assuming state and goal_state are tuples representing coordinates (x, y)
+    return abs(state[0] - goal_state[0]) + abs(state[1] - goal_state[1])
 
 # Example usage:
-start_state = ...
-goal_state = ...
+start_state = (0, 0)  # Example start state, replace with actual start state
+goal_state = (5, 5)   # Example goal state, replace with actual goal state
 path = astar_search(start_state, goal_state, heuristic)
 print("A* Path:", path)

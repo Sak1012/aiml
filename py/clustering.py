@@ -1,3 +1,10 @@
+# run below commands in powershell in order
+# cd to current folder
+# python -m venv venv
+# .\venv\Scripts\Activate.ps1
+# pip install numpy matplotlib scikit-learn
+# python ./clustering.py
+
 import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.datasets import make_blobs
