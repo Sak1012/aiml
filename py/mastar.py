@@ -45,16 +45,21 @@ def ma_star_search(start_state, goal_state, heuristic, memory_limit):
     return None
 
 def get_neighbors(state):
-    # Implement your function to get neighboring states here
-    pass
+    x, y = state
+    # Assuming movement is allowed in 4 directions (up, down, left, right)
+    neighbors = [(x-1, y), (x+1, y), (x, y-1), (x, y+1)]
+    # You may want to filter out invalid neighbors (e.g., out of bounds)
+    # or based on your specific problem constraints
+    return neighbors
 
 def heuristic(state, goal_state):
-    # Implement your heuristic function here
-    pass
+    x1, y1 = state
+    x2, y2 = goal_state
+    return abs(x1 - x2) + abs(y1 - y2)
 
 # Example usage:
-start_state = ...
-goal_state = ...
-memory_limit = ...
+start_state = (0, 0)  # Example start state, replace with actual start state
+goal_state = (5, 5)   # Example goal state, replace with actual goal state
+memory_limit = 100    # Example memory limit, adjust according to your needs
 path = ma_star_search(start_state, goal_state, heuristic, memory_limit)
 print("MA* Path:", path)

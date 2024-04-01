@@ -1,32 +1,33 @@
-from pgmpy.models import BayesianModel
-from pgmpy.factors.discrete import TabularCPD
-from pgmpy.inference import VariableElimination
+import random
 
-# Define the Bayesian network structure
-model = BayesianModel([('C', 'G'), ('H', 'G'), ('C', 'H')])
+def run_trial(switch_doors, ndoors=3):
+    # Pick a random door out of the ndoors available
+    chosen_door = random.randint(1, ndoors)
+    if switch_doors:
+        # Reveal a goat
+        revealed_door = 3 if chosen_door==2 else 2
+        # Make the switch by choosing any other door than the initially-
+        # selected one and the one just opened to reveal a goat. 
+        available_doors = [dnum for dnum in range(1,ndoors+1)
+                                if dnum not in (chosen_door, revealed_door)]
+        chosen_door = random.choice(available_doors)
 
-# Define conditional probability distributions (CPDs)
-cpd_c = TabularCPD(variable='C', variable_card=3, values=[[1/3], [1/3], [1/3]])
+    # You win if you picked door number 1
+    return chosen_door == 1
 
-cpd_h = TabularCPD(variable='H', variable_card=3, values=[[0, 0, 1, 1, 0, 1],
-                                                          [0.5, 0, 0, 0, 1, 0],
-                                                          [0.5, 1, 0, 0, 0, 0]],
-                   evidence=['C'], evidence_card=[3])
+def run_trials(ntrials, switch_doors, ndoors=3):
+    nwins = 0
+    for i in range(ntrials):
+        if run_trial(switch_doors, ndoors):
+            nwins += 1
+    return nwins
 
-cpd_g = TabularCPD(variable='G', variable_card=3, values=[[0, 1, 1, 1, 0, 0],
-                                                          [0, 0, 0, 0, 0.5, 1],
-                                                          [1, 0, 0, 0, 0.5, 0]],
-                   evidence=['C', 'H'], evidence_card=[3, 3])
+ndoors, ntrials = 3, 10000
+nwins_without_switch = run_trials(ntrials, False, ndoors)
+nwins_with_switch = run_trials(ntrials, True, ndoors)
 
-# Add CPDs to the model
-model.add_cpds(cpd_c, cpd_h, cpd_g)
-
-# Check if the model is valid
-print("Model valid?", model.check_model())
-
-# Perform inference using Variable Elimination
-inference = VariableElimination(model)
-
-# Calculate probability of winning the car given that the contestant chose door 1 and Monty opened door 3
-query_result = inference.query(variables=['G'], evidence={'C': 0, 'H': 2})
-print(query_result)
+print('Monty Hall Problem with {} doors'.format(ndoors))
+print('Proportion of wins without switching: {:.4f}'
+            .format(nwins_without_switch/ntrials))
+print('Proportion of wins with switching: {:.4f}'
+            .format(nwins_with_switch/ntrials))

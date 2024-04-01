@@ -1,3 +1,10 @@
+# run below commands in powershell in order
+# cd to current folder
+# python -m venv venv
+# .\venv\Scripts\Activate.ps1
+# pip install pandas matplotlib scikit-learn numpy
+# python ./regression.py
+
 import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.datasets import make_regression
