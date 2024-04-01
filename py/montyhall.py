@@ -1,66 +1,33 @@
-from pomegranate import *
-# say library doesnt work. cos it literally doesnt. sorry i couldnt fix it
-# Define the Bayesian network structure
-guest = Node(DiscreteDistribution({
-    "A": 1./3,
-    "B": 1./3,
-    "C": 1./3
-}), name="guest")
+import random
 
-prize = Node(DiscreteDistribution({
-    "A": 1./3,
-    "B": 1./3,
-    "C": 1./3
-}), name="prize")
+def run_trial(switch_doors, ndoors=3):
+    # Pick a random door out of the ndoors available
+    chosen_door = random.randint(1, ndoors)
+    if switch_doors:
+        # Reveal a goat
+        revealed_door = 3 if chosen_door==2 else 2
+        # Make the switch by choosing any other door than the initially-
+        # selected one and the one just opened to reveal a goat. 
+        available_doors = [dnum for dnum in range(1,ndoors+1)
+                                if dnum not in (chosen_door, revealed_door)]
+        chosen_door = random.choice(available_doors)
 
-monty = Node(ConditionalProbabilityTable(
-    [["A", "A", "A", 0.0],
-     ["A", "A", "B", 0.5],
-     ["A", "A", "C", 0.5],
-     ["A", "B", "C", 1.0],
-     ["A", "C", "B", 1.0],
-     ["B", "A", "C", 1.0],
-     ["B", "B", "B", 0.0],
-     ["B", "B", "A", 0.5],
-     ["B", "B", "C", 0.5],
-     ["B", "C", "A", 1.0],
-     ["C", "A", "B", 1.0],
-     ["C", "B", "A", 1.0],
-     ["C", "C", "C", 0.0],
-     ["C", "C", "A", 0.5],
-     ["C", "C", "B", 0.5]],
-    [guest, prize]), name="monty")
+    # You win if you picked door number 1
+    return chosen_door == 1
 
-# Create the Bayesian network
-network = BayesianNetwork()
-network.add_states(guest, prize, monty)
-network.add_edge(guest, monty)
-network.add_edge(prize, monty)
-network.bake()
+def run_trials(ntrials, switch_doors, ndoors=3):
+    nwins = 0
+    for i in range(ntrials):
+        if run_trial(switch_doors, ndoors):
+            nwins += 1
+    return nwins
 
-# Simulate the Monty Hall problem
-num_trials = 100000
-wins = 0
+ndoors, ntrials = 3, 10000
+nwins_without_switch = run_trials(ntrials, False, ndoors)
+nwins_with_switch = run_trials(ntrials, True, ndoors)
 
-for _ in range(num_trials):
-    # Set initial states
-    guest_state = np.random.choice(["A", "B", "C"], p=[1./3, 1./3, 1./3])
-    prize_state = np.random.choice(["A", "B", "C"], p=[1./3, 1./3, 1./3])
-    network.predict(guest.array_index(guest_state), prize.array_index(prize_state))
-
-    # Guest's initial choice
-    guest_choice = guest_state
-
-    # Monty opens a door
-    monty_open = monty.value
-
-    # Guest switches their choice
-    new_choice = "A" if (guest_choice != "A" and monty_open != "A") else \
-                  "B" if (guest_choice != "B" and monty_open != "B") else "C"
-
-    # Check if the guest wins
-    if new_choice == prize_state:
-        wins += 1
-
-# Print the result
-print(f"Wins by switching: {wins / num_trials * 100:.2f}%")
+print('Monty Hall Problem with {} doors'.format(ndoors))
+print('Proportion of wins without switching: {:.4f}'
+            .format(nwins_without_switch/ntrials))
+print('Proportion of wins with switching: {:.4f}'
+            .format(nwins_with_switch/ntrials))
